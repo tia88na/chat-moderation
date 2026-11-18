@@ -10,6 +10,7 @@ Run:
     python app.py
 Then open the local URL it prints (http://127.0.0.1:7860).
 """
+import re
 import time
 import torch
 import torch.nn as nn
@@ -18,6 +19,18 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 MODEL_ID = "tia88na/berturk-offenseval-tr"
 LABELS = ["clean", "offensive"]
+
+# Area B normalization applied before the model, to resist evasions
+# (UPPERCASE, leetspeak, stretched letters). Turkish-aware lowercasing.
+LEET = str.maketrans({"0": "o", "1": "i", "3": "e", "4": "a",
+                      "5": "s", "7": "t", "@": "a", "$": "s"})
+
+
+def normalize(text):
+    text = text.replace("İ", "i").replace("I", "ı").lower()  # Turkish lower
+    text = re.sub(r"(.)\1{2,}", r"\1\1", text)               # çoook -> çook
+    text = text.translate(LEET)                              # leetspeak -> letters
+    return text
 
 print("Loading model from Hugging Face (first run downloads it)...")
 tok = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -37,7 +50,8 @@ def classify(message, model_name, log):
     if message and message.strip():
         model = MODELS[model_name]
         t0 = time.perf_counter()
-        enc = tok(message, truncation=True, max_length=128, return_tensors="pt")
+        enc = tok(normalize(message), truncation=True, max_length=128,
+                  return_tensors="pt")
         with torch.no_grad():
             probs = torch.softmax(model(**enc).logits, dim=-1)[0]
         latency = (time.perf_counter() - t0) * 1000
