@@ -24,6 +24,11 @@ tok = AutoTokenizer.from_pretrained(MODEL_ID)
 fp32 = AutoModelForSequenceClassification.from_pretrained(MODEL_ID).eval()
 int8 = torch.quantization.quantize_dynamic(fp32, {nn.Linear}, dtype=torch.qint8)
 MODELS = {"INT8 (quantized)": int8, "FP32": fp32}
+
+# warm up both models so the FIRST real message isn't slow (one-time kernel setup)
+with torch.no_grad():
+    for _m in MODELS.values():
+        _m(**tok("ısınma", return_tensors="pt"))
 print("Ready.")
 
 
@@ -39,7 +44,7 @@ def classify(message, model_name, log):
         lid = int(probs.argmax())
         conf = float(probs[lid])
         label = LABELS[lid]
-        shown = message if label == "clean" else "█" * min(len(message.strip()), 24)
+        shown = message if label == "clean" else "⟨hidden⟩"
         status = "🟢 clean" if label == "clean" else "🔴 offensive (masked)"
         log = log + [[shown, status, f"{conf:.0%}", f"{latency:.1f}", model_name]]
     return log, log, ""
