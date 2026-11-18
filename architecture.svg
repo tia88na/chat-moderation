@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 720" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#444"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1040" height="720" fill="#ffffff"/>
+  <text x="520" y="36" text-anchor="middle" font-size="24" font-weight="700" fill="#111">Real-Time Chat Moderation — System Architecture (SWE015 · UC4)</text>
+
+  <!-- OFFLINE SECTION -->
+  <rect x="24" y="60" width="992" height="250" rx="10" fill="#f3f6fb" stroke="#c9d6e8"/>
+  <text x="44" y="88" font-size="16" font-weight="700" fill="#2b5fa8">OFFLINE — Training &amp; Evaluation (same OffensEval-TR test set)</text>
+
+  <rect x="44" y="110" width="170" height="80" rx="8" fill="#ffffff" stroke="#7a99c4"/>
+  <text x="129" y="142" text-anchor="middle" font-size="14" font-weight="600" fill="#111">OffensEval-TR 2020</text>
+  <text x="129" y="163" text-anchor="middle" font-size="12" fill="#555">31.7k train / 3.5k test</text>
+  <text x="129" y="179" text-anchor="middle" font-size="12" fill="#555">NOT / OFF labels</text>
+
+  <!-- four models -->
+  <rect x="300" y="100" width="300" height="42" rx="6" fill="#ffffff" stroke="#7a99c4"/>
+  <text x="312" y="126" font-size="13" fill="#111"><tspan font-weight="700">B</tspan>  tf-idf + Logistic Regression — 0.72 F1</text>
+  <rect x="300" y="150" width="300" height="42" rx="6" fill="#ffffff" stroke="#7a99c4"/>
+  <text x="312" y="176" font-size="13" fill="#111"><tspan font-weight="700">A</tspan>  word2vec + Feedforward (FP32) — 0.54 F1</text>
+  <rect x="300" y="200" width="300" height="42" rx="6" fill="#ffffff" stroke="#7a99c4"/>
+  <text x="312" y="226" font-size="13" fill="#111"><tspan font-weight="700">C</tspan>  BERTurk fine-tuned (FP32) — 0.81 F1</text>
+  <rect x="300" y="250" width="300" height="42" rx="6" fill="#eaf5ec" stroke="#4a9d5b"/>
+  <text x="312" y="276" font-size="13" fill="#111"><tspan font-weight="700">D</tspan>  BERTurk quantized (INT8) — 0.81 F1 ★</text>
+
+  <rect x="690" y="150" width="300" height="100" rx="8" fill="#ffffff" stroke="#7a99c4"/>
+  <text x="840" y="182" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Results table (R4)</text>
+  <text x="840" y="206" text-anchor="middle" font-size="12" fill="#555">macro-F1 · size (MB) · latency (ms)</text>
+  <text x="840" y="226" text-anchor="middle" font-size="12" fill="#555">measured on the same test set</text>
+
+  <line x1="214" y1="150" x2="296" y2="150" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="214" y1="196" x2="296" y2="221" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="196" x2="686" y2="196" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- bridge: best model to serving -->
+  <text x="662" y="330" font-size="12" font-style="italic" fill="#4a9d5b">best model → pushed to Hugging Face Hub → served live</text>
+  <line x1="450" y1="292" x2="450" y2="360" stroke="#4a9d5b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- LIVE APP SECTION -->
+  <rect x="24" y="360" width="992" height="330" rx="10" fill="#fbf6f3" stroke="#e8cfc0"/>
+  <text x="44" y="388" font-size="16" font-weight="700" fill="#a8602b">LIVE APP — Gradio, runs on CPU (localhost:7860)</text>
+
+  <rect x="44" y="410" width="150" height="70" rx="8" fill="#ffffff" stroke="#c99a7a"/>
+  <text x="119" y="440" text-anchor="middle" font-size="13" font-weight="600" fill="#111">User</text>
+  <text x="119" y="460" text-anchor="middle" font-size="12" fill="#555">types Turkish</text>
+  <text x="119" y="475" text-anchor="middle" font-size="12" fill="#555">message</text>
+
+  <rect x="232" y="410" width="160" height="70" rx="8" fill="#ffffff" stroke="#c99a7a"/>
+  <text x="312" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#111">Preprocessing</text>
+  <text x="312" y="454" text-anchor="middle" font-size="12" fill="#555">BERTurk tokenizer</text>
+  <text x="312" y="470" text-anchor="middle" font-size="12" fill="#555">(WordPiece, max 128)</text>
+
+  <rect x="430" y="405" width="180" height="80" rx="8" fill="#eaf5ec" stroke="#4a9d5b"/>
+  <text x="520" y="432" text-anchor="middle" font-size="13" font-weight="700" fill="#111">Quantized INT8</text>
+  <text x="520" y="450" text-anchor="middle" font-size="13" font-weight="700" fill="#111">BERTurk</text>
+  <text x="520" y="470" text-anchor="middle" font-size="11" fill="#555">(FP32 switchable) · softmax</text>
+
+  <rect x="648" y="410" width="170" height="70" rx="8" fill="#ffffff" stroke="#c99a7a"/>
+  <text x="733" y="432" text-anchor="middle" font-size="13" font-weight="700" fill="#111">Post-processing</text>
+  <text x="733" y="452" text-anchor="middle" font-size="12" fill="#555">label + confidence</text>
+  <text x="733" y="468" text-anchor="middle" font-size="12" fill="#555">mask OFF · time latency</text>
+
+  <rect x="856" y="410" width="140" height="70" rx="8" fill="#ffffff" stroke="#c99a7a"/>
+  <text x="926" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#111">Gradio UI</text>
+  <text x="926" y="454" text-anchor="middle" font-size="12" fill="#555">live feed +</text>
+  <text x="926" y="470" text-anchor="middle" font-size="12" fill="#555">latency log</text>
+
+  <line x1="194" y1="445" x2="228" y2="445" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="392" y1="445" x2="426" y2="445" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="610" y1="445" x2="644" y2="445" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="818" y1="445" x2="852" y2="445" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- model source -->
+  <rect x="430" y="560" width="180" height="56" rx="8" fill="#ffffff" stroke="#9ab0d0"/>
+  <text x="520" y="584" text-anchor="middle" font-size="12" font-weight="600" fill="#111">Hugging Face Hub</text>
+  <text x="520" y="602" text-anchor="middle" font-size="11" fill="#555">tia88na/berturk-offenseval-tr</text>
+  <line x1="520" y1="560" x2="520" y2="487" stroke="#9ab0d0" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="528" y="528" font-size="11" font-style="italic" fill="#6b6b6b">loaded + quantized at startup</text>
+
+  <text x="926" y="512" text-anchor="middle" font-size="11" fill="#777">↩ user sends next message</text>
+</svg>
