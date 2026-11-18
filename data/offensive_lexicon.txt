@@ -1,7 +1,0 @@
-# Offensive seed words for the edit-distance RULE baseline (Area B).
-# One word per line, lowercase. Lines starting with # are ignored.
-# Fill this with offensive Turkish terms you want the rule matcher to catch.
-# A few neutral placeholders are here only so the code runs; replace them.
-aptal
-salak
-gerizekali
